@@ -442,3 +442,66 @@ export const $ValidationError = {
     },
   },
 } as const
+
+export const $InfringementAnalysis = {
+  properties: {
+    analysis_id: {
+      type: "string",
+      isRequired: true,
+    },
+    patent_id: {
+      type: "string",
+      isRequired: true,
+    },
+    company_name: {
+      type: "string",
+      isRequired: true,
+    },
+    analysis_date: {
+      type: "string",
+      format: "date-time", // Optional: to specify date format
+      isRequired: true,
+    },
+    top_infringing_products: {
+      type: "array",
+      contains: {
+        type: "object",
+        properties: {
+          product_name: {
+            type: "string",
+            isRequired: true,
+          },
+          infringement_likelihood: {
+            type: "string",
+            enum: ["High", "Moderate", "Low"], // Optional: specifying possible values
+            isRequired: true,
+          },
+          relevant_claims: {
+            type: "array",
+            contains: {
+              type: "string",
+            },
+            isRequired: true,
+          },
+          explanation: {
+            type: "string",
+            isRequired: true,
+          },
+          specific_features: {
+            type: "array",
+            contains: {
+              type: "string",
+            },
+            isRequired: true,
+          },
+        },
+        isRequired: true,
+      },
+      isRequired: true,
+    },
+    overall_risk_assessment: {
+      type: "string",
+      isRequired: true,
+    },
+  },
+} as const;

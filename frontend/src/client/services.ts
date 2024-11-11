@@ -18,6 +18,11 @@ import type {
   ItemPublic,
   ItemsPublic,
   ItemUpdate,
+  InfringementAnalysisPublic,
+  PatentPublic,
+  PatentsPublic,
+  CompanyPublic,
+  CompaniesPublic,
 } from "./models"
 
 export type TDataLoginAccessToken = {
@@ -525,5 +530,163 @@ export class ItemsService {
         422: `Validation Error`,
       },
     })
+  }
+}
+
+export type TInfringementCheck = {
+  patentId: string;
+  companyName: string;
+};
+
+export class InfringementService {
+  /**
+   * Run Infringement Check
+   * Checks for patent infringement against a company.
+   * @returns InfringementAnalysisPublic Successful Response
+   * @throws ApiError
+   */
+  public static checkInfringement(
+    data: TInfringementCheck,
+  ): CancelablePromise<InfringementAnalysisPublic> {
+    const { patentId, companyName } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/infringement/check/",
+      body: {
+        patent_id: patentId,
+        company_name: companyName,
+      },
+      mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    });
+  }
+
+  /**
+   * Get Infringement Report
+   * Retrieve a report by analysis ID.
+   * @returns InfringementAnalysisPublic Successful Response
+   * @throws ApiError
+   */
+  public static getInfringementReport(
+    analysisId: string,
+  ): CancelablePromise<InfringementAnalysisPublic> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/api/v1/infringement/${encodeURIComponent(analysisId)}`,
+      errors: {
+        404: `Report Not Found`,
+        422: `Validation Error`,
+      },
+    });
+  }
+}
+
+
+
+export type TPatent = {
+  patentId: string;
+};
+
+export type TDataReadPatents = {
+  limit?: number;
+  skip?: number;
+};
+
+export class PatentService {
+  /**
+   * Get All Patents
+   * Retrieve all patents.
+   * @returns PatentsPublic Successful Response
+   * @throws ApiError
+   */
+  public static readPatents(
+    data: TDataReadPatents = {},
+  ): CancelablePromise<PatentsPublic> {
+    const { limit, skip } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/patents/",
+      query: {
+        skip,
+        limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    });
+  }
+
+  /**
+   * Get Patent by ID
+   * Retrieve a specific patent by its ID.
+   * @returns PatentPublic Successful Response
+   * @throws ApiError
+   */
+  public static readPatent(data: TPatent): CancelablePromise<PatentPublic> {
+    const { patentId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/api/v1/patents/${encodeURIComponent(patentId)}`,
+      errors: {
+        404: `Patent Not Found`,
+        422: `Validation Error`,
+      },
+    });
+  }
+}
+
+
+
+export type TCompany = {
+  name: string;
+};
+
+export type TDataReadCompanies = {
+  limit?: number;
+  skip?: number;
+};
+
+export class CompanyService {
+  /**
+   * Get All Companies
+   * Retrieve all companies.
+   * @returns CompaniesPublic Successful Response
+   * @throws ApiError
+   */
+  public static readCompanies(
+    data: TDataReadCompanies = {},
+  ): CancelablePromise<CompaniesPublic> {
+    const { limit, skip } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/companies/",
+      query: {
+        skip,
+        limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    });
+  }
+
+  /**
+   * Get Company by Name
+   * Retrieve details of a specific company by its name.
+   * @returns CompanyPublic Successful Response
+   * @throws ApiError
+   */
+  public static readCompany(data: TCompany): CancelablePromise<CompanyPublic> {
+    const { name } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/api/v1/companies/${encodeURIComponent(name)}`,
+      errors: {
+        404: `Company Not Found`,
+        422: `Validation Error`,
+      },
+    });
   }
 }

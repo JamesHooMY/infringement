@@ -1,13 +1,17 @@
 import { Box, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { FiBriefcase, FiHome, FiSettings, FiUsers } from "react-icons/fi"
-
+import { FiBriefcase, FiHome, FiSettings, FiUsers,FiList } from "react-icons/fi"
+import {FaRegBuilding} from "react-icons/fa"
+import { MdErrorOutline } from "react-icons/md"
 import type { UserPublic } from "../../client"
 
 const items = [
   { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiBriefcase, title: "Items", path: "/items" },
+  // { icon: FiBriefcase, title: "Items", path: "/items" },
+  { icon: FaRegBuilding, title: "Companies", path: "/companies" },
+  { icon: FiList, title: "Patents", path: "/patents" },
+  { icon: MdErrorOutline, title: "Infringement", path: "/infringementAnalysis" },
   { icon: FiSettings, title: "User Settings", path: "/settings" },
 ]
 
