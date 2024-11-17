@@ -47,7 +47,7 @@
 
 [![API docs](img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
 
-## How To Use It
+## How to start the services
 
 1. Change the value of `OPENAI_API_KEY` in the `.env` file to your key. This free key can be obtained from [FreeChatgptAPI](https://github.com/popjane/free_chatgpt_api?tab=readme-ov-file#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D).
 
@@ -57,3 +57,7 @@ docker-compose up -d
 ```
 
 3. Open your browser and go to `http://localhost:8000`.
+
+4. You can log in with the default admin user below:
+- **Username:** `james_test@yopmail.com`
+- **Password:** `password`
