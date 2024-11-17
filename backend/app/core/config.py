@@ -97,6 +97,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_PASSWORD: str
 
+    OPENAI_API_KEY: str
+    OPENAI_BASE_URL: AnyUrl | None = None
+    OPENAI_DEFAULT_HEADER_X_FOO: bool = False
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (

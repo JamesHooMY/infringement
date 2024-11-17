@@ -551,7 +551,7 @@ export class InfringementService {
     const { patentId, companyName } = data;
     return __request(OpenAPI, {
       method: "POST",
-      url: "/api/v1/infringement/check/",
+      url: "/api/v1/infringement/check",
       body: {
         patent_id: patentId,
         company_name: companyName,

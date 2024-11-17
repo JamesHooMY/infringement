@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 from sqlalchemy import Column
-from typing import List, Dict, Optional, Any, Union
+from typing import List, Dict, Optional, Union
 from sqlalchemy.dialects.postgresql import JSON
 
 

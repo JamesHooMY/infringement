@@ -132,34 +132,34 @@ export type PatentPublic = {
   id: string;
   publication_number: string; // * this is the patent_id in the InfringementAnalysis type
   title: string;
-  ai_summary: string;
-  raw_source_url: string;
-  assignee: string;
+  ai_summary?: string | null; // Allow optional and nullable
+  raw_source_url?: string | null;
+  assignee?: string | null;
   inventors: Array<{
     first_name: string;
     last_name: string;
   }>;
-  priority_date: string; // You can use Date if you plan to parse it as a Date object
-  application_date: string; // Same as above for Date parsing
-  grant_date: string; // Same as above for Date parsing
+  priority_date: string; // Consider `Date` type
+  application_date: string; // Consider `Date` type
+  grant_date: string; // Consider `Date` type
   abstract: string;
   description: string;
   claims: Array<{
     num: string;
     text: string;
   }>;
-  jurisdictions: string;
-  classifications: string; // This can be further parsed into a more structured type if needed
-  application_events: string; // Adjust if needed
-  citations: string; // Adjust if needed or further parse into an array/object
-  image_urls: string; // Adjust if needed (e.g., parse as an array)
-  landscapes: string; // Adjust if needed
-  created_at: string; // Same as above for Date parsing
-  updated_at: string; // Same as above for Date parsing
-  publish_date: string; // Same as above for Date parsing
-  citations_non_patent: string; // Adjust if needed
-  provenance: string;
-  attachment_urls: string | null; // Adjust type as needed
+  jurisdictions?: string | null;
+  classifications?: string | null;
+  application_events?: string | null;
+  citations?: string | null;
+  image_urls?: string | null;
+  landscapes?: string | null;
+  created_at: string; // Consider `Date` type
+  updated_at: string; // Consider `Date` type
+  publish_date: string; // Consider `Date` type
+  citations_non_patent?: string | null;
+  provenance?: string | null;
+  attachment_urls?: string | null;
 };
 
 export type PatentsPublic = {

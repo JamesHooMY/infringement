@@ -2,10 +2,12 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   FormControl,
   FormLabel,
   Heading,
-  Input,
+  Progress,
+  Select,
   SkeletonText,
   Table,
   TableContainer,
@@ -15,12 +17,14 @@ import {
   Thead,
   Tr,
   VStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { InfringementService } from "../../client";
+import { InfringementService, PatentService, CompanyService } from "../../client";
 import Navbar from "../../components/Common/Navbar";
+import { PaginationFooter } from "../../components/Common/PaginationFooter.tsx"; // 若需要分頁功能可加入
 
 export const Route = createFileRoute("/_layout/infringementAnalysis")({
   component: InfringementAnalysis,
@@ -29,6 +33,16 @@ export const Route = createFileRoute("/_layout/infringementAnalysis")({
 function InfringementsForm({ onSubmit }: { onSubmit: (patentId: string, companyName: string) => void }) {
   const [patentId, setPatentId] = useState("");
   const [companyName, setCompanyName] = useState("");
+
+  // Fetch all patents and companies
+  const { data: patents, isLoading: loadingPatents } = useQuery({
+    queryKey: ["patents"],
+    queryFn: () => PatentService.readPatents({ limit: 100 })
+  });
+  const { data: companies, isLoading: loadingCompanies } = useQuery({
+    queryKey: ["companies"],
+    queryFn: () => CompanyService.readCompanies({ limit: 100 })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,23 +54,45 @@ function InfringementsForm({ onSubmit }: { onSubmit: (patentId: string, companyN
       <VStack spacing={4} align="stretch">
         <FormControl>
           <FormLabel>Patent ID</FormLabel>
-          <Input
-            value={patentId}
-            onChange={(e) => setPatentId(e.target.value)}
-            placeholder="Enter Patent ID"
-            required
-          />
+          {loadingPatents ? (
+            <SkeletonText noOfLines={1} />
+          ) : (
+            <Select
+              placeholder="Select a Patent"
+              value={patentId}
+              onChange={(e) => setPatentId(e.target.value)}
+              required
+              width={{ base: "100%", md: "50%" }} // Adjusted width
+            >
+              {patents?.data.map((patent: any) => (
+                <option key={patent.id} value={patent.publication_number}>
+                  {`${patent.publication_number} - ${patent.title}`}
+                </option>
+              ))}
+            </Select>
+          )}
         </FormControl>
         <FormControl>
           <FormLabel>Company Name</FormLabel>
-          <Input
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            placeholder="Enter Company Name"
-            required
-          />
+          {loadingCompanies ? (
+            <SkeletonText noOfLines={1} />
+          ) : (
+            <Select
+              placeholder="Select a Company"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+              width={{ base: "100%", md: "50%" }} // Adjusted width
+            >
+              {companies?.data.map((company: any) => (
+                <option key={company.id} value={company.name}>
+                  {company.name}
+                </option>
+              ))}
+            </Select>
+          )}
         </FormControl>
-        <Button type="submit" colorScheme="blue">
+        <Button type="submit" colorScheme="blue" width={{ base: "100%", md: "30%" }}>
           Submit for Analysis
         </Button>
       </VStack>
@@ -65,9 +101,14 @@ function InfringementsForm({ onSubmit }: { onSubmit: (patentId: string, companyN
 }
 
 function InfringementsResult({ data, isLoading }: { data?: any; isLoading: boolean }) {
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const [showFullExplanation, setShowFullExplanation] = useState<{ [key: number]: boolean }>({});
+
   if (isLoading) {
     return (
-      <SkeletonText mt="4" noOfLines={4} spacing="4" />
+      <Box width="100%" mt={4}>
+        <Progress size="md" isIndeterminate colorScheme="teal" />
+      </Box>
     );
   }
 
@@ -75,22 +116,89 @@ function InfringementsResult({ data, isLoading }: { data?: any; isLoading: boole
     return null;
   }
 
+  const toggleExplanation = (index: number) => {
+    setShowFullExplanation((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   return (
-    <TableContainer>
-      <Table size={{ base: "sm", md: "md" }}>
-        <Thead>
+    <TableContainer maxWidth="100%" overflowX="auto">
+      <Box mt={6} maxWidth="100%" whiteSpace="pre-wrap" wordBreak="break-word">
+        <Heading size="md">Overall Risk Assessment</Heading>
+        <Box mt={2} p={2} borderWidth="1px" borderRadius="md" borderColor={borderColor} bg={useColorModeValue("gray.50", "gray.800")}>
+          {data.overall_risk_assessment}
+        </Box>
+      </Box>
+      <Divider my={4} borderColor={borderColor} />
+      <Table
+        variant="striped"
+        colorScheme="teal"
+        size="md"
+        border="1px solid"
+        borderColor={borderColor}
+        width="100%"
+      >
+        <Thead bg={useColorModeValue("gray.100", "gray.700")}>
           <Tr>
-            <Th>Product Name</Th>
-            <Th>Infringement Likelihood</Th>
-            <Th>Relevant Claims</Th>
+            <Th borderRight="1px solid" borderColor={borderColor} maxWidth="150px" whiteSpace="nowrap">
+              Product Name
+            </Th>
+            <Th borderRight="1px solid" borderColor={borderColor} maxWidth="150px" whiteSpace="nowrap">
+              Infringement Likelihood
+            </Th>
+            <Th borderRight="1px solid" borderColor={borderColor} maxWidth="150px" whiteSpace="nowrap">
+              Relevant Claims
+            </Th>
+            <Th borderRight="1px solid" borderColor={borderColor} maxWidth="300px" whiteSpace="pre-wrap" wordBreak="break-word">
+              Explanation
+            </Th>
+            <Th borderRight="1px solid" borderColor={borderColor} maxWidth="200px" whiteSpace="pre-wrap" wordBreak="break-word">
+              Specific Features
+            </Th>
+            <Th maxWidth="150px" whiteSpace="nowrap">Analysis Date</Th>
           </Tr>
         </Thead>
         <Tbody>
           {data.top_infringing_products.map((product: any, index: number) => (
             <Tr key={index}>
-              <Td>{product.product_name}</Td>
-              <Td>{product.infringement_likelihood}</Td>
-              <Td>{product.relevant_claims.join(", ")}</Td>
+              <Td maxWidth="150px" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                {product.product_name}
+              </Td>
+              <Td maxWidth="150px" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                {product.infringement_likelihood}
+              </Td>
+              <Td maxWidth="150px" whiteSpace="pre-wrap" wordBreak="break-word">
+                <ul style={{ paddingLeft: "1rem" }}>
+                  {product.relevant_claims.map((claim: string, i: number) => (
+                    <li key={i}>{claim}</li>
+                  ))}
+                </ul>
+              </Td>
+              <Td maxWidth="300px" whiteSpace="pre-wrap" wordBreak="break-word">
+                {showFullExplanation[index]
+                  ? product.explanation
+                  : `${product.explanation.substring(0, 100)}...`}
+                {product.explanation.length > 100 && (
+                  <Button
+                    variant="link"
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() => toggleExplanation(index)}
+                  >
+                    {showFullExplanation[index] ? "Show Less" : "Show More"}
+                  </Button>
+                )}
+              </Td>
+              <Td maxWidth="200px" whiteSpace="pre-wrap" wordBreak="break-word">
+                <ul style={{ paddingLeft: "1rem" }}>
+                  {product.specific_features.map((feature: string, i: number) => (
+                    <li key={i}>{feature}</li>
+                  ))}
+                </ul>
+              </Td>
+              <Td maxWidth="150px" whiteSpace="nowrap">{new Date(data.analysis_date).toLocaleString()}</Td>
             </Tr>
           ))}
         </Tbody>
@@ -99,19 +207,18 @@ function InfringementsResult({ data, isLoading }: { data?: any; isLoading: boole
   );
 }
 
+
 function InfringementAnalysis() {
   const [result, setResult] = useState<any>(null);
 
-  const mutation: UseMutationResult<any, Error, { patentId: string; companyName: string }> = useMutation(
-    {
-      mutationKey: ['checkInfringement'],
-      mutationFn: ({ patentId, companyName }: { patentId: string; companyName: string }) =>
-        InfringementService.checkInfringement({ patentId, companyName }),
-      onSuccess: (data) => {
-        setResult(data);
-      },
-    }
-  );
+  const mutation: UseMutationResult<any, Error, { patentId: string; companyName: string }> = useMutation({
+    mutationKey: ["checkInfringement"],
+    mutationFn: ({ patentId, companyName }: { patentId: string; companyName: string }) =>
+      InfringementService.checkInfringement({ patentId, companyName }),
+    onSuccess: (data) => {
+      setResult(data);
+    },
+  });
 
   const handleSubmit = (patentId: string, companyName: string) => {
     mutation.mutate({ patentId, companyName });
@@ -124,9 +231,8 @@ function InfringementAnalysis() {
       </Heading>
 
       {/* <Navbar type={"Infringement"} /> */}
-
       <InfringementsForm onSubmit={handleSubmit} />
-      <InfringementsResult data={result} isLoading={mutation.status === 'pending'} />
+      <InfringementsResult data={result} isLoading={mutation.status === "pending"} />
     </Container>
   );
 }
