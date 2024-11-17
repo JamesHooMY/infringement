@@ -23,8 +23,6 @@ import { useState } from "react";
 import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { InfringementService, PatentService, CompanyService } from "../../client";
-import Navbar from "../../components/Common/Navbar";
-import { PaginationFooter } from "../../components/Common/PaginationFooter.tsx"; // 若需要分頁功能可加入
 
 export const Route = createFileRoute("/_layout/infringementAnalysis")({
   component: InfringementAnalysis,
