@@ -15,7 +15,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { CompanyService } from "../../client/index.ts";
 import ActionsMenu from "../../components/Common/ActionsMenu.tsx";
-import Navbar from "../../components/Common/Navbar.tsx";
 import { PaginationFooter } from "../../components/Common/PaginationFooter.tsx";
 import { z } from "zod"
 
