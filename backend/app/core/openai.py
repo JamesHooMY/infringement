@@ -80,7 +80,7 @@ class PatentInfringementAnalyzer:
             # logger.debug("Calling OpenAI API with input message: %s", input_message)
             # Call OpenAI API
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-3.5-turbo-16k",
                 # model="gpt-4o-mini",
                 messages=[
                     # {
