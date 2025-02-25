@@ -31,6 +31,8 @@ ENV PYTHONPATH=/app
 
 COPY ./scripts /app/scripts
 
+RUN chmod +x /app/scripts/prestart.sh
+
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
 COPY ./app /app/app
@@ -40,4 +42,4 @@ COPY ./app /app/app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["/bin/bash", "-c", "/app/scripts/prestart.sh && fastapi run --workers 1 app/main.py"]
