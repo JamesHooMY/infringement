@@ -132,3 +132,84 @@ docker-compose up -d
 4. You can log in with the default admin user below:
 - **Username:** `james_test@yopmail.com`
 - **Password:** `password`
+
+
+## Optimized system design for the best performance and scalability.
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+graph TD;
+    %% API Layer: User, API Gateway, and FastAPI Service
+    subgraph "API Layer"
+       User[User Frontend Request]
+       API_Gateway[API Gateway]
+       FastAPI[FastAPI Service]
+    end
+
+    %% AI Service Management Layer: Managing AI Models, Task Scheduling, and Authentication
+    subgraph "AI Service Management Layer"
+       AI_ServiceMgmt[AI Service Management]
+       AI_Model1[Patent Application Drafting]
+       AI_Model2[Infringement Detection]
+       AI_Model3[Claim Charts]
+       AI_Model4[Patent Pruning]
+       AI_ServiceMgmt -->|Dispatch| AI_Model1
+       AI_ServiceMgmt -->|Dispatch| AI_Model2
+       AI_ServiceMgmt -->|Dispatch| AI_Model3
+       AI_ServiceMgmt -->|Dispatch| AI_Model4
+       TaskQueue[Task Queue Celery / Redis Queue]
+       Identity[Identity & Access Management OAuth2 / JWT]
+    end
+
+    %% Storage and Caching Layer: Persistent Storage and Caching Services
+    subgraph "Storage & Caching"
+       DB[PostgreSQL / MongoDB Historical Data Storage]
+       Cache[Redis Cache]
+    end
+
+    %% Big Data Processing Layer: Hadoop and Spark for Batch Data Processing
+    subgraph "Big Data Processing Layer"
+       HDFS[Hadoop HDFS Raw Data / Result Storage]
+       Spark[Spark Batch Data Processing]
+    end
+
+    %% Data Crawling Layer: Web Crawlers for Data Collection
+    subgraph "Data Crawling Layer"
+       Crawler[Web Crawler Service]
+    end
+
+    %% Data Flow Connections
+    %% Frontend Requests Enter API Layer
+    User -->|API Request| API_Gateway
+    API_Gateway -->|HTTP/gRPC| FastAPI
+
+    %% FastAPI Queries Cache and DB
+    FastAPI -->|Query Cache| Cache
+    Cache -- Cache Hit --> FastAPI
+    Cache -- Cache Miss --> DB
+    DB -- Data Found --> FastAPI
+    DB -- No Result --> AI_ServiceMgmt
+
+    %% FastAPI Sends Query Request to AI Service Management
+    FastAPI -->|Query AI Service| AI_ServiceMgmt
+
+    %% AI Analysis Results Stored in DB
+    AI_Model1 -->|Analysis Result| DB
+    AI_Model2 -->|Analysis Result| DB
+    AI_Model3 -->|Analysis Result| DB
+    AI_Model4 -->|Analysis Result| DB
+
+    %% API Gateway Handles Authentication and Task Distribution
+    API_Gateway -->|Authentication| Identity
+    API_Gateway -->|Distribute Task| TaskQueue
+    TaskQueue --> AI_ServiceMgmt
+
+    %% Big Data Processing Flow: Crawling, HDFS, and Spark Processing
+    Crawler -->|Crawl Data| HDFS
+    HDFS -->|Raw Data| Spark
+    Spark -->|Processed Data| DB
+    DB -- Spark Processed Data --> AI_ServiceMgmt
+
+    %% Final Results Returned to User
+    FastAPI -->|Return Result| User
+
+```
